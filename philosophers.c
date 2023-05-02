@@ -44,8 +44,8 @@ void	*philo_rout(void *arg)
 
 	p = (philo_t *) arg;
 	while (p->ist->start == -1) {}
-//	if (p->id % 2 == 0 && p->id != p->ist->phil_num - 1)
-//		usleep(2);
+	if (p->id % 2 == 0 && p->id != p->ist->phil_num - 1)
+		usleep(20);
 	if (p->id != p->ist->phil_num - 1)
 		usleep(3);
 	i = -1;
@@ -133,16 +133,9 @@ int	free_all(ist_t *ist, philo_t **tab)
 	int	i;
 
 	i = -1;
-	while (++i < ist->phil_num)
-		pthread_join(tab[i]->th, NULL);
-	i = -1;
 	printf("\n");
 	while (++i < ist->phil_num)
 	{
-		if (pthread_mutex_destroy(&(tab[i]->sx_fork)))
-			return (error_managment(7));
-		if (pthread_mutex_destroy(&(tab[i]->life)))
-			return (error_managment(7));
 		free(tab[i]);
 	}
 	free(tab);
