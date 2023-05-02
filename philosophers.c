@@ -6,7 +6,7 @@
 /*   By: frmonfre <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/02 09:43:00 by frmonfre          #+#    #+#             */
-/*   Updated: 2023/05/02 10:17:01 by frmonfre         ###   ########.fr       */
+/*   Updated: 2023/05/02 11:53:11 by frmonfre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,19 +17,14 @@ int	ist_init(ist_t	**ist, int argc, char **argv)
 	*ist = (ist_t *) malloc(sizeof(ist_t));
 	if (!(*ist))
 		return (error_managment(2));
-	(*ist)->phil_num = atoi(argv[1]);
-	(*ist)->ttd = atoi(argv[2]);
-	(*ist)->tte = atoi(argv[3]);
-	(*ist)->tts = atoi(argv[4]);
-	(*ist)->nme = 0;
-	if (argc == 6)
-		(*ist)->nme = atoi(argv[5]);
-	if ((*ist)->phil_num <= 0 || (*ist)->ttd <= 0 || (*ist)->tte <= 0 || 
+	/*if ((*ist)->phil_num <= 0 || (*ist)->ttd <= 0 || (*ist)->tte <= 0 || 
 	    (*ist)->tts <= 0 || (*ist)->nme < 0)
 	{
 		free(*ist);
 		return (error_managment(3));
-	}
+	}*/
+	(*ist)->phil_num = atoi(argv[1]);
+	(*ist)->ttd = atoi(argv[2]);
 	(*ist)->start = -1;
 	(*ist)->control = (long long int *) malloc(sizeof(long long int) * (*ist)->phil_num);
 	if (!(*ist)->control)
@@ -39,6 +34,8 @@ int	ist_init(ist_t	**ist, int argc, char **argv)
 		return (error_managment(2));
 	}
 	pthread_mutex_init(&(*ist)->start_mutex, NULL);
+	pthread_mutex_init(&(*ist)->control_mutex, NULL);
+	pthread_mutex_init(&(*ist)->time_mutex, NULL);
 	return (0);
 }
 
@@ -63,38 +60,58 @@ void	*philo_rout(void *arg)
 	int		i;
 
 	p = (philo_t *) arg;
+
 	while (p->ist->start == -1) {}
-	if (p->id % 2 == 0 && p->id != p->ist->phil_num - 1)
+//	while (1) 
+//	{
+//		pthread_mutex_lock(&p->ist->start_mutex);
+//		if (p->ist->start != -1)
+//			break;
+//		pthread_mutex_unlock(&p->ist->start_mutex);
+//	}
+	if (p->id % 2 == 0 && p->id != p->phil_num - 1)
 		usleep(50);
-	if (p->id != p->ist->phil_num - 1)
+	if (p->id != p->phil_num - 1)
 		usleep(100);
 	i = -1;
-	while (++i < p->ist->nme && p->ist->start != -1)
+	while (++i < p->nme && p->ist->start != -1)
 	{
 		if (p->ist->start == -1)
 			break;
+		pthread_mutex_lock(&p->ist->time_mutex);
 		printf("%lld ms: %d is thinking\n", get_time(p->ist->init), p->id);
+		pthread_mutex_unlock(&p->ist->time_mutex);
 		pthread_mutex_lock(p->dx_fork);
 		if (p->ist->start == -1)
 			break;
+		pthread_mutex_lock(&p->ist->time_mutex);
 		printf("%lld ms: %d has taken a fork\n", get_time(p->ist->init), p->id);
+		pthread_mutex_unlock(&p->ist->time_mutex);
 		pthread_mutex_lock(&p->sx_fork);
 		if (p->ist->start == -1)
 			break;
+		pthread_mutex_lock(&p->ist->time_mutex);
 		printf("%lld ms: %d has taken a fork\n", get_time(p->ist->init), p->id);
+		pthread_mutex_unlock(&p->ist->time_mutex);
 		if (p->ist->start == -1)
 			break;
+		pthread_mutex_lock(&p->ist->time_mutex);
 		printf("%lld ms: %d is eating\n", get_time(p->ist->init), p->id);
-		my_usleep(p->ist->tte, p->ist->init);
+		pthread_mutex_unlock(&p->ist->time_mutex);
+		my_usleep(p->tte, p->ist->init);
+		pthread_mutex_lock(&p->ist->control_mutex);
 		p->ist->control[p->id - 1] = get_time(p->ist->init);
+		pthread_mutex_unlock(&p->ist->control_mutex);
 		pthread_mutex_unlock(p->dx_fork);
 		pthread_mutex_unlock(&p->sx_fork);
 		if (p->ist->start == -1)
 			break;
+		pthread_mutex_lock(&p->ist->time_mutex);
 		printf("%lld ms: %d is sleeping\n", get_time(p->ist->init), p->id);
-		my_usleep(p->ist->tts, p->ist->init);
+		pthread_mutex_unlock(&p->ist->time_mutex);
+		my_usleep(p->tts, p->ist->init);
 	}
-	if (p->id == p->ist->phil_num - 1)
+	if (p->id == p->phil_num - 1)
 	{
 		pthread_mutex_lock(&p->ist->start_mutex);
 		p->ist->start = -1;
@@ -107,28 +124,40 @@ void	*control_rout(void *arg)
 {
 	ist_t	*ist;
 	int		i;
+	int		tmp;
 
 	ist = (ist_t *) arg;
+//	pthread_mutex_lock(&ist->start_mutex);
+//	tmp = ist->start != -1;
+//	pthread_mutex_unlock(&ist->start_mutex);
 	while (ist->start != -1)
 	{
 		i = -1;
 		while (++i < ist->phil_num && ist->start != -1)
 		{
 			//printf("%lld - %lld < %d\n", get_time(ist->init), ist->control[i], ist->ttd);
+			pthread_mutex_lock(&ist->control_mutex);
+			tmp = ist->control[i];
+			pthread_mutex_unlock(&ist->control_mutex);
 			if (get_time(ist->init) - ist->control[i] > ist->ttd)
 			{
 				pthread_mutex_lock(&ist->start_mutex);
 				ist->start = -1;
 				pthread_mutex_unlock(&ist->start_mutex);
+				pthread_mutex_lock(&ist->time_mutex);
 				printf("%lld ms: %d died\n", get_time(ist->init), i + 1);
+				pthread_mutex_unlock(&ist->time_mutex);
 				return (0);
 			}	
 		}
+//		pthread_mutex_lock(&ist->start_mutex);
+//		tmp = ist->start != -1;
+//		pthread_mutex_unlock(&ist->start_mutex);
 	}
 	return (0);
 }
 
-int	philo_create(philo_t **tab, ist_t *ist)
+int	philo_create(philo_t **tab, ist_t *ist, int argc, char **argv)
 {
 	int	i;
 
@@ -146,14 +175,19 @@ int	philo_create(philo_t **tab, ist_t *ist)
 		if (pthread_mutex_init(&(tab[i]->sx_fork), NULL))
 			return (error_managment(5));
 		tab[i]->id = i + 1;
+		tab[i]->ttd = atoi(argv[2]);
+		tab[i]->tte = atoi(argv[3]);
+		tab[i]->tts = atoi(argv[4]);
+		tab[i]->phil_num = atoi(argv[1]);
+		tab[i]->nme = 0;
+		if (argc == 6)
+			tab[i]->nme = atoi(argv[5]);
 		if (pthread_create(&tab[i]->th, NULL, &philo_rout , (void *) tab[i]))
 			return (error_managment(4));
 	}
 	i = -1;
 	while (++i < ist->phil_num)
-	{
 		pthread_detach(tab[i]->th);
-	}
 	ist->tab = tab;
 	return (0);
 }
@@ -166,11 +200,14 @@ int	free_all(ist_t *ist, philo_t **tab)
 	printf("\n");
 	while (++i < ist->phil_num)
 	{
+		//pthread_mutex_destroy(&tab[i]->sx_fork);
 		free(tab[i]);
 	}
 	free(tab);
 	free(ist->control);
-	pthread_mutex_unlock(&ist->start_mutex);
+//	pthread_mutex_destroy(&ist->start_mutex);
+//	pthread_mutex_destroy(&ist->control_mutex);
+//	pthread_mutex_destroy(&ist->time_mutex);
 	free(ist);
 	return (0);
 }
@@ -199,7 +236,7 @@ int main(int argc, char **argv)
 {
 	ist_t		*ist;
 	philo_t		**tab;
-	pthread_t	control;
+	pthread_t	control_th;
 	int		i;
 	int		err;
 
@@ -211,20 +248,26 @@ int main(int argc, char **argv)
 	tab = (philo_t **) malloc(sizeof(philo_t *) * ist->phil_num);
 	if (!tab)
 		return(error_managment(2));
-	err = philo_create(tab, ist);
+	err = philo_create(tab, ist, argc, argv);
 	if (err)
 		return (err);
 
-	if (pthread_create(&control, NULL, &control_rout, (void *) ist))
+	if (pthread_create(&control_th, NULL, &control_rout, (void *) ist))
 		return (error_managment(4));
+
+	pthread_mutex_lock(&ist->time_mutex);
 	gettimeofday(&ist->init, NULL);
+	pthread_mutex_unlock(&ist->time_mutex);
+	
+	pthread_mutex_lock(&ist->start_mutex);
 	ist->start = get_time(ist->init);
-//	printf("START %lldms\n", ist->start);
+	pthread_mutex_unlock(&ist->start_mutex);
 	i = -1;
+
 	while (++i < ist->phil_num)
 		ist->control[i] = ist->start;
 
-	if (pthread_join(control, NULL))
+	if (pthread_join(control_th, NULL))
 		return (error_managment(6));
 	free_all(ist, tab);
 }
