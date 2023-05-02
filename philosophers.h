@@ -14,7 +14,7 @@ typedef struct ist_s
 	int		tts;
 	int		nme;
 	long long int	start;
-	struct timeval	time;
+	struct timeval	init;
 	long long int	*control;
 	philo_t		**tab;
 }	ist_t;
@@ -24,6 +24,7 @@ typedef struct philo_s
 	pthread_t		th;
 	pthread_mutex_t	sx_fork;
 	pthread_mutex_t *dx_fork;
+	pthread_mutex_t	life;
 	ist_t			*ist;
 	int				id;
 }	philo_t;
@@ -36,6 +37,6 @@ void	*control_rout(void *arg);
 
 int	philo_create(philo_t **tab, ist_t *ist);
 
-void	free_all(ist_t *ist);
+int	free_all(ist_t *ist, philo_t **tab);
 
 int	error_managment(int error_code);
