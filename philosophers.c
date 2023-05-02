@@ -19,7 +19,6 @@ int	ist_init(ist_t	**ist, int argc, char **argv)
 		return (error_managment(3));
 	}
 	(*ist)->start = -1;
-	gettimeofday(&(*ist)->init, NULL);
 	(*ist)->control = (long long int *) malloc(sizeof(long long int) * (*ist)->phil_num);
 	if (!(*ist)->control)
 	{
@@ -45,29 +44,38 @@ void	*philo_rout(void *arg)
 
 	p = (philo_t *) arg;
 	while (p->ist->start == -1) {}
-	if (p->id % 2 == 0 && p->id != p->ist->phil_num - 1)
-		usleep(2);
+//	if (p->id % 2 == 0 && p->id != p->ist->phil_num - 1)
+//		usleep(2);
 	if (p->id != p->ist->phil_num - 1)
 		usleep(3);
 	i = -1;
 	while (++i < p->ist->nme || !p->ist->nme)
 	{
-		printf("%lldms %d is thinking\n", get_time(p->ist->init), p->id);
+		if (p->ist->start == -1)
+			break;
+		printf("%lld ms: %d is thinking\n", get_time(p->ist->init), p->id);
 		pthread_mutex_lock(p->dx_fork);
-		printf("%lldms %d has taken a fork\n", get_time(p->ist->init), p->id);
+		if (p->ist->start == -1)
+			break;
+		printf("%lld ms: %d has taken a fork\n", get_time(p->ist->init), p->id);
 		pthread_mutex_lock(&p->sx_fork);
-		printf("%lldms %d has taken a fork\n", get_time(p->ist->init), p->id);
-		printf("%lldms %d is eating\n", get_time(p->ist->init), p->id);
+		if (p->ist->start == -1)
+			break;
+		printf("%lld ms: %d has taken a fork\n", get_time(p->ist->init), p->id);
+		if (p->ist->start == -1)
+			break;
+		printf("%lld ms: %d is eating\n", get_time(p->ist->init), p->id);
 		usleep(p->ist->tte * 1000);
 		p->ist->control[p->id - 1] = get_time(p->ist->init);
 		pthread_mutex_unlock(p->dx_fork);
 		pthread_mutex_unlock(&p->sx_fork);
-		printf("%lldms %d is sleeping\n", get_time(p->ist->init), p->id);
+		if (p->ist->start == -1)
+			break;
+		printf("%lld ms: %d is sleeping\n", get_time(p->ist->init), p->id);
 		usleep(p->ist->tts * 1000);
 	}
-	printf("mannaggia la madonna\n");
-	if (p->id != p->ist->phil_num - 1)
-		p->ist->start = 0;
+	if (p->id == p->ist->phil_num - 1)
+		p->ist->start = -1;
 	return (0);
 }
 
@@ -86,7 +94,8 @@ void	*control_rout(void *arg)
 			if (get_time(ist->init) - ist->control[i] > ist->ttd)
 			{
 				ist->nme = -1;
-				printf("%lldms %d died\n", get_time(ist->init), i + 1);
+				ist->start = -1;
+				printf("%lld ms: %d died\n", get_time(ist->init), i + 1);
 				return (0);
 			}	
 		}
@@ -157,8 +166,8 @@ int	error_managment(int error_code)
 		write(2, "Error(5): error in mutex initialization!\n", 41);
 	if (error_code == 6)
 		write(2, "Error(6): error in thread join!\n", 32);
-	if (error_code == 7)
-		write(2, "Error(7): error in mutex destruction\n", 38);
+	//if (error_code == 7)
+	//	write(2, "Error(7): error in mutex destruction\n", 38);
 	return (error_code);
 }
    
@@ -184,6 +193,7 @@ int main(int argc, char **argv)
 
 	if (pthread_create(&control, NULL, &control_rout, (void *) ist))
 		return (error_managment(4));
+	gettimeofday(&ist->init, NULL);
 	ist->start = get_time(ist->init);
 //	printf("START %lldms\n", ist->start);
 	i = -1;
@@ -192,6 +202,5 @@ int main(int argc, char **argv)
 
 	if (pthread_join(control, NULL))
 		return (error_managment(6));
-	if (free_all(ist, tab))
-		return (error_managment(7));
+	free_all(ist, tab);
 }
