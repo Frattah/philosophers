@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philosophers.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: frmonfre <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/05/02 09:43:00 by frmonfre          #+#    #+#             */
+/*   Updated: 2023/05/02 10:17:01 by frmonfre         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philosophers.h"
 
 int	ist_init(ist_t	**ist, int argc, char **argv)
@@ -26,6 +38,7 @@ int	ist_init(ist_t	**ist, int argc, char **argv)
 		free((*ist)->control);
 		return (error_managment(2));
 	}
+	pthread_mutex_init(&(*ist)->start_mutex, NULL);
 	return (0);
 }
 
@@ -37,6 +50,13 @@ long long       get_time(struct timeval init)
         return (timeval.tv_sec * 1000 + timeval.tv_usec / 1000 - init.tv_sec * 1000 - init.tv_usec / 1000);
 }
 
+void	my_usleep(int mms, struct timeval init)
+{
+	long long int ref = get_time(init);
+	while (get_time(init) != ref + mms)
+		usleep(10);
+}
+
 void	*philo_rout(void *arg)
 {
 	philo_t	*p;
@@ -45,11 +65,11 @@ void	*philo_rout(void *arg)
 	p = (philo_t *) arg;
 	while (p->ist->start == -1) {}
 	if (p->id % 2 == 0 && p->id != p->ist->phil_num - 1)
-		usleep(20);
+		usleep(50);
 	if (p->id != p->ist->phil_num - 1)
-		usleep(3);
+		usleep(100);
 	i = -1;
-	while (++i < p->ist->nme || !p->ist->nme)
+	while (++i < p->ist->nme && p->ist->start != -1)
 	{
 		if (p->ist->start == -1)
 			break;
@@ -65,17 +85,21 @@ void	*philo_rout(void *arg)
 		if (p->ist->start == -1)
 			break;
 		printf("%lld ms: %d is eating\n", get_time(p->ist->init), p->id);
-		usleep(p->ist->tte * 1000);
+		my_usleep(p->ist->tte, p->ist->init);
 		p->ist->control[p->id - 1] = get_time(p->ist->init);
 		pthread_mutex_unlock(p->dx_fork);
 		pthread_mutex_unlock(&p->sx_fork);
 		if (p->ist->start == -1)
 			break;
 		printf("%lld ms: %d is sleeping\n", get_time(p->ist->init), p->id);
-		usleep(p->ist->tts * 1000);
+		my_usleep(p->ist->tts, p->ist->init);
 	}
 	if (p->id == p->ist->phil_num - 1)
+	{
+		pthread_mutex_lock(&p->ist->start_mutex);
 		p->ist->start = -1;
+		pthread_mutex_unlock(&p->ist->start_mutex);
+	}
 	return (0);
 }
 
@@ -93,8 +117,9 @@ void	*control_rout(void *arg)
 			//printf("%lld - %lld < %d\n", get_time(ist->init), ist->control[i], ist->ttd);
 			if (get_time(ist->init) - ist->control[i] > ist->ttd)
 			{
-				ist->nme = -1;
+				pthread_mutex_lock(&ist->start_mutex);
 				ist->start = -1;
+				pthread_mutex_unlock(&ist->start_mutex);
 				printf("%lld ms: %d died\n", get_time(ist->init), i + 1);
 				return (0);
 			}	
@@ -124,6 +149,11 @@ int	philo_create(philo_t **tab, ist_t *ist)
 		if (pthread_create(&tab[i]->th, NULL, &philo_rout , (void *) tab[i]))
 			return (error_managment(4));
 	}
+	i = -1;
+	while (++i < ist->phil_num)
+	{
+		pthread_detach(tab[i]->th);
+	}
 	ist->tab = tab;
 	return (0);
 }
@@ -140,6 +170,7 @@ int	free_all(ist_t *ist, philo_t **tab)
 	}
 	free(tab);
 	free(ist->control);
+	pthread_mutex_unlock(&ist->start_mutex);
 	free(ist);
 	return (0);
 }

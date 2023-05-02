@@ -8,15 +8,16 @@ typedef struct philo_s philo_t;
 
 typedef struct ist_s
 {
-	int		phil_num;
 	int		ttd;
 	int		tte;
 	int		tts;
 	int		nme;
+	int		phil_num;
 	long long int	start;
 	struct timeval	init;
 	long long int	*control;
 	philo_t		**tab;
+	pthread_mutex_t	start_mutex;
 }	ist_t;
 
 typedef struct philo_s
@@ -24,7 +25,6 @@ typedef struct philo_s
 	pthread_t		th;
 	pthread_mutex_t	sx_fork;
 	pthread_mutex_t *dx_fork;
-	pthread_mutex_t	life;
 	ist_t			*ist;
 	int				id;
 }	philo_t;
