@@ -12,38 +12,43 @@
 
 #include "philo.h"
 
-long long int	get_time(long long int init)
+long long int	get_time(struct timeval init)
 {
-	struct timeval	time;
-	long long int	actual;
+	struct timeval	actual;
+	long long int	actual_mms;
+	long long int	init_mms;
 
-	gettimeofday(&time, NULL);
-	actual = time.tv_sec * 1000 + time.tv_usec / 1000;
-	return (actual - init);
+	gettimeofday(&actual, NULL);
+	init_mms = init.tv_sec * 1000 + init.tv_usec / 1000;
+	actual_mms = actual.tv_sec * 1000 + actual.tv_usec / 1000;
+	return (actual_mms - init_mms);
 }
 
-void	my_usleep(int mms, long long int init)
+void	my_usleep(int mms, struct timeval init)
 {
-	while (get_time(init) - init != mms)
+	long long int	ref;
+
+	ref = get_time(init);
+	while (get_time(init) - ref != mms)
 		usleep(10);
 }
 
 void	*philo_routine(void *arg)
 {
 	t_philo		*philo;
-	int			tmp;
+	int			i;
 
 	philo = (t_philo *) arg;
-	pthread_mutex_lock(&philo->shared->srt_dth_mutex);
-	tmp = philo->shared->start_death == 0;
-	pthread_mutex_unlock(&philo->shared->srt_dth_mutex);
-	while (tmp)
+	wait(philo);
+	i = -1;
+	while (++i < philo->stats[5] || !philo->stats[5])
 	{
-		pthread_mutex_lock(&philo->shared->srt_dth_mutex);
-		tmp = philo->shared->start_death == 0;
-		pthread_mutex_unlock(&philo->shared->srt_dth_mutex);
+		pthread_mutex_lock(&philo->shared->time_mutex);
+		printf("%lld ms: %d is thinking\n",
+			get_time(philo->shared->init), philo->stats[0]);
+		pthread_mutex_unlock(&philo->shared->time_mutex);
+		eat_and_sleep(philo);
 	}
-	printf("Ciao sono un filosofo\n");
 	return (0);
 }
 
@@ -61,15 +66,15 @@ void	free_all(t_shared *shared, t_philo **tab)
 	}
 	free(tab);
 	pthread_mutex_destroy(&shared->srt_dth_mutex);
+	pthread_mutex_destroy(&shared->time_mutex);
 	free(shared);
 }
 
 int	main(int argc, char **argv)
 {
-	t_shared		*shared;
-	struct timeval	time;
-	int				i;
-	t_philo			**tab;
+	t_shared	*shared;
+	int			i;
+	t_philo		**tab;
 
 	shared = NULL;
 	shared = shared_init(shared);
@@ -78,14 +83,12 @@ int	main(int argc, char **argv)
 	tab = tab_init(shared, argc, argv);
 	i = -1;
 	pthread_mutex_lock(&shared->srt_dth_mutex);
-	gettimeofday(&time, NULL);
-	shared->init = time.tv_sec * 1000 + time.tv_usec / 1000;
+	gettimeofday(&shared->init, NULL);
 	shared->start_death = 1;
 	pthread_mutex_unlock(&shared->srt_dth_mutex);
 	while (++i < atoi(argv[1]))
 	{	
 		pthread_join(tab[i]->th, NULL);
 	}
-	printf("%lld ms\n", get_time(shared->init));
 	free_all(shared, tab);
 }

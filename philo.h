@@ -24,7 +24,8 @@ typedef struct s_shared
 {	
 	int				start_death;
 	pthread_mutex_t	srt_dth_mutex;
-	long long int	init;
+	pthread_mutex_t	time_mutex;
+	struct timeval	init;
 }	t_shared;
 
 typedef struct s_philo
@@ -37,13 +38,21 @@ typedef struct s_philo
 	int				stats[6];
 }	t_philo;
 
-void		*philo_routine(void *arg);
+void			*philo_routine(void *arg);
 
-void		free_all(t_shared *shared, t_philo **tab);
+void			free_all(t_shared *shared, t_philo **tab);
 
-t_philo		*philo_init(t_shared *shared, t_philo *philo, int arc, char **arv);
+void			my_usleep(int mms, struct timeval init);
 
-t_philo		**tab_init(t_shared *shared, int argc, char **argv);
+long long int	get_time(struct timeval init);
 
-t_shared	*shared_init(t_shared *shared);
+t_philo			*philo_init(t_shared *s, t_philo *p, int a, char **c);
+
+t_philo			**tab_init(t_shared *shared, int argc, char **argv);
+
+t_shared		*shared_init(t_shared *shared);
+
+void			wait(t_philo *philo);
+
+void			eat_and_sleep(t_philo *philo);
 #endif

@@ -26,7 +26,6 @@ t_philo	*philo_init(t_shared *shared, t_philo *philo, int arc, char **arv)
 		philo->stats[5] = atoi(arv[5]);
 	philo->shared = shared;
 	philo->last_eat = 0;
-	pthread_create(&philo->th, NULL, &philo_routine, (void *) philo);
 	return (philo);
 }
 
@@ -47,6 +46,7 @@ t_philo	**tab_init(t_shared *shared, int arc, char **arv)
 		tab[i]->stats[0] = i + 1;
 		if (i != 0)
 			tab[i]->sx_fork = &tab[i - 1]->dx_fork;
+		pthread_create(&tab[i]->th, NULL, &philo_routine, (void *) tab[i]);
 	}
 	tab[0]->sx_fork = &tab[phil_num - 1]->dx_fork;
 	return (tab);
@@ -59,5 +59,6 @@ t_shared	*shared_init(t_shared *shared)
 		return (NULL);
 	shared->start_death = 0;
 	pthread_mutex_init(&shared->srt_dth_mutex, NULL);
+	pthread_mutex_init(&shared->time_mutex, NULL);
 	return (shared);
 }
