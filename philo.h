@@ -6,7 +6,7 @@
 /*   By: frmonfre <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 08:38:28 by frmonfre          #+#    #+#             */
-/*   Updated: 2023/05/04 10:13:59 by frmonfre         ###   ########.fr       */
+/*   Updated: 2023/05/04 11:44:40 by frmonfre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ typedef struct s_shared
 {	
 	int				start_death;
 	pthread_mutex_t	srt_dth_mutex;
-	pthread_mutex_t	time_mutex;
+	pthread_mutex_t	print_mutex;
 	struct timeval	init;
 }	t_shared;
 
@@ -55,4 +55,6 @@ t_shared		*shared_init(t_shared *shared);
 void			waiting(t_philo *philo);
 
 void			eat_and_sleep(t_philo *philo);
+
+void			print(t_philo *philo, char *str);
 #endif

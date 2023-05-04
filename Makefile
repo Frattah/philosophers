@@ -6,11 +6,11 @@
 #    By: frmonfre <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 10:58:18 by frmonfre          #+#    #+#              #
-#    Updated: 2023/05/03 11:35:49 by frmonfre         ###   ########.fr        #
+#    Updated: 2023/05/04 11:41:29 by frmonfre         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS	=	philo.c	init.c action.c
+SRCS	=	philo.c	init.c action.c utils.c
 
 OBJS	=	$(SRCS:.c=.o)
 

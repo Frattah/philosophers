@@ -6,7 +6,7 @@
 /*   By: frmonfre <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 09:35:02 by frmonfre          #+#    #+#             */
-/*   Updated: 2023/05/04 10:28:58 by frmonfre         ###   ########.fr       */
+/*   Updated: 2023/05/04 11:51:37 by frmonfre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,7 @@ void	*philo_routine(void *arg)
 	i = -1;
 	while (++i < philo->stats[5] || !philo->stats[5])
 	{
-		printf("%lld ms: %d is thinking\n",
-			get_time(philo->shared->init), philo->stats[0]);
+		print(philo, "is thinking");
 		eat_and_sleep(philo);
 	}
 	return (0);
@@ -64,7 +63,7 @@ void	free_all(t_shared *shared, t_philo **tab)
 	}
 	free(tab);
 	pthread_mutex_destroy(&shared->srt_dth_mutex);
-	pthread_mutex_destroy(&shared->time_mutex);
+	pthread_mutex_destroy(&shared->print_mutex);
 	free(shared);
 }
 
@@ -84,9 +83,5 @@ int	main(int argc, char **argv)
 	gettimeofday(&shared->init, NULL);
 	shared->start_death = 1;
 	pthread_mutex_unlock(&shared->srt_dth_mutex);
-	while (++i < atoi(argv[1]))
-	{	
-		pthread_join(tab[i]->th, NULL);
-	}
-	free_all(shared, tab);
+	//free_all(shared, tab);
 }

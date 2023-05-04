@@ -6,7 +6,7 @@
 /*   By: frmonfre <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 11:38:48 by frmonfre          #+#    #+#             */
-/*   Updated: 2023/05/03 11:42:21 by frmonfre         ###   ########.fr       */
+/*   Updated: 2023/05/04 11:49:14 by frmonfre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ t_philo	**tab_init(t_shared *shared, int arc, char **arv)
 		if (i != 0)
 			tab[i]->sx_fork = &tab[i - 1]->dx_fork;
 		pthread_create(&tab[i]->th, NULL, &philo_routine, (void *) tab[i]);
+		pthread_detach(tab[i]->th);
 	}
 	tab[0]->sx_fork = &tab[phil_num - 1]->dx_fork;
 	return (tab);
@@ -59,6 +60,6 @@ t_shared	*shared_init(t_shared *shared)
 		return (NULL);
 	shared->start_death = 0;
 	pthread_mutex_init(&shared->srt_dth_mutex, NULL);
-	pthread_mutex_init(&shared->time_mutex, NULL);
+	pthread_mutex_init(&shared->print_mutex, NULL);
 	return (shared);
 }
