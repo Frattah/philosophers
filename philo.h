@@ -6,7 +6,7 @@
 /*   By: frmonfre <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 08:38:28 by frmonfre          #+#    #+#             */
-/*   Updated: 2023/05/03 11:51:01 by frmonfre         ###   ########.fr       */
+/*   Updated: 2023/05/04 10:13:59 by frmonfre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ t_philo			**tab_init(t_shared *shared, int argc, char **argv);
 
 t_shared		*shared_init(t_shared *shared);
 
-void			wait(t_philo *philo);
+void			waiting(t_philo *philo);
 
 void			eat_and_sleep(t_philo *philo);
 #endif

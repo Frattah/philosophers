@@ -6,7 +6,7 @@
 /*   By: frmonfre <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 09:35:02 by frmonfre          #+#    #+#             */
-/*   Updated: 2023/05/03 11:59:39 by frmonfre         ###   ########.fr       */
+/*   Updated: 2023/05/04 10:28:58 by frmonfre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,14 +39,12 @@ void	*philo_routine(void *arg)
 	int			i;
 
 	philo = (t_philo *) arg;
-	wait(philo);
+	waiting(philo);
 	i = -1;
 	while (++i < philo->stats[5] || !philo->stats[5])
 	{
-		pthread_mutex_lock(&philo->shared->time_mutex);
 		printf("%lld ms: %d is thinking\n",
 			get_time(philo->shared->init), philo->stats[0]);
-		pthread_mutex_unlock(&philo->shared->time_mutex);
 		eat_and_sleep(philo);
 	}
 	return (0);

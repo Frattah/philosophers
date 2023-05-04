@@ -12,10 +12,6 @@ echo "\n\nTest #3"
 echo "\n\nTest #4"
 ./philo 100 800 200 200 1
 
-
-echo "\n\nTest #4"
+echo "\n\nTest #5"
 ./philo 3 410 200 200
-
-#echo "\n\nTest #4"
-#./philo 1 800 200 200 2
 
