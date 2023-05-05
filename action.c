@@ -26,7 +26,7 @@ void	waiting(t_philo *philo)
 		pthread_mutex_unlock(&philo->shared->srt_dth_mutex);
 	}
 	if (philo->stats[0] % 2 == 0)
-		usleep(philo->stats[3] / 10);
+		usleep(50);
 }
 
 void	eat_and_sleep(t_philo *philo)

@@ -47,7 +47,6 @@ t_philo	**tab_init(t_shared *shared, int arc, char **arv)
 		if (i != 0)
 			tab[i]->sx_fork = &tab[i - 1]->dx_fork;
 		pthread_create(&tab[i]->th, NULL, &philo_routine, (void *) tab[i]);
-		pthread_detach(tab[i]->th);
 	}
 	tab[0]->sx_fork = &tab[phil_num - 1]->dx_fork;
 	return (tab);

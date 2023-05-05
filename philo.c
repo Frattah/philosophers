@@ -33,22 +33,6 @@ void	my_usleep(int mms, struct timeval init)
 		usleep(10);
 }
 
-void	*philo_routine(void *arg)
-{
-	t_philo		*philo;
-	int			i;
-
-	philo = (t_philo *) arg;
-	waiting(philo);
-	i = -1;
-	while (++i < philo->stats[5] || !philo->stats[5])
-	{
-		print(philo, "is thinking");
-		eat_and_sleep(philo);
-	}
-	return (0);
-}
-
 void	free_all(t_shared *shared, t_philo **tab)
 {
 	int	i;
@@ -70,18 +54,20 @@ void	free_all(t_shared *shared, t_philo **tab)
 int	main(int argc, char **argv)
 {
 	t_shared	*shared;
-	int			i;
 	t_philo		**tab;
+	int			i;
 
 	shared = NULL;
 	shared = shared_init(shared);
 	if (!shared)
 		return (1);
 	tab = tab_init(shared, argc, argv);
-	i = -1;
 	pthread_mutex_lock(&shared->srt_dth_mutex);
-	gettimeofday(&shared->init, NULL);
 	shared->start_death = 1;
+	gettimeofday(&shared->init, NULL);
 	pthread_mutex_unlock(&shared->srt_dth_mutex);
-	//free_all(shared, tab);
+	i = -1;
+	while (++i < atoi(argv[1]))
+		pthread_join(tab[i]->th, NULL);
+	free_all(shared, tab);
 }

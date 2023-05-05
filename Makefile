@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-SRCS	=	philo.c	init.c action.c utils.c
+SRCS	=	philo.c	init.c action.c utils.c	routine.c
 
 OBJS	=	$(SRCS:.c=.o)
 
