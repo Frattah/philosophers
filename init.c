@@ -6,7 +6,7 @@
 /*   By: frmonfre <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 11:38:48 by frmonfre          #+#    #+#             */
-/*   Updated: 2023/05/04 11:49:14 by frmonfre         ###   ########.fr       */
+/*   Updated: 2023/05/05 11:57:36 by frmonfre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ t_philo	*philo_init(t_shared *shared, t_philo *philo, int arc, char **arv)
 	if (arc == 6)
 		philo->stats[5] = atoi(arv[5]);
 	philo->shared = shared;
-	philo->last_eat = 0;
 	return (philo);
 }
 
@@ -52,13 +51,22 @@ t_philo	**tab_init(t_shared *shared, int arc, char **arv)
 	return (tab);
 }
 
-t_shared	*shared_init(t_shared *shared)
+t_shared	*shared_init(t_shared *shared, int phil_num)
 {
+	int	i;
+
 	shared = (t_shared *) malloc(sizeof(t_shared));
 	if (!shared)
 		return (NULL);
-	shared->start_death = 0;
-	pthread_mutex_init(&shared->srt_dth_mutex, NULL);
+	shared->stop = 1;
+	shared->lst_eat = malloc(sizeof(long long int) * phil_num);
+	if (!shared->lst_eat)
+		return (NULL);
+	i = -1;
+	while (++i < phil_num)
+		shared->lst_eat[i] = 0;
+	pthread_mutex_init(&shared->stop_mutex, NULL);
 	pthread_mutex_init(&shared->print_mutex, NULL);
+	pthread_mutex_init(&shared->lst_eat_mutex, NULL);
 	return (shared);
 }

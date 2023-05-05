@@ -6,7 +6,7 @@
 /*   By: frmonfre <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 09:35:02 by frmonfre          #+#    #+#             */
-/*   Updated: 2023/05/04 11:51:37 by frmonfre         ###   ########.fr       */
+/*   Updated: 2023/05/05 11:31:49 by frmonfre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,11 +42,10 @@ void	free_all(t_shared *shared, t_philo **tab)
 	phil_num = tab[0]->stats[1];
 	while (++i < phil_num)
 	{
-		pthread_mutex_destroy(&tab[i]->dx_fork);
 		free(tab[i]);
 	}
 	free(tab);
-	pthread_mutex_destroy(&shared->srt_dth_mutex);
+	pthread_mutex_destroy(&shared->stop_mutex);
 	pthread_mutex_destroy(&shared->print_mutex);
 	free(shared);
 }
@@ -55,19 +54,24 @@ int	main(int argc, char **argv)
 {
 	t_shared	*shared;
 	t_philo		**tab;
+	pthread_t	control;
 	int			i;
 
 	shared = NULL;
-	shared = shared_init(shared);
+	shared = shared_init(shared, atoi(argv[1]));
 	if (!shared)
 		return (1);
 	tab = tab_init(shared, argc, argv);
-	pthread_mutex_lock(&shared->srt_dth_mutex);
-	shared->start_death = 1;
+	pthread_create(&control, NULL, &control_routine, (void *) tab);
+	pthread_mutex_lock(&shared->stop_mutex);
+	shared->stop = 0;
 	gettimeofday(&shared->init, NULL);
-	pthread_mutex_unlock(&shared->srt_dth_mutex);
+	pthread_mutex_unlock(&shared->stop_mutex);
 	i = -1;
 	while (++i < atoi(argv[1]))
+	{
 		pthread_join(tab[i]->th, NULL);
+	}
+	pthread_join(control, NULL);
 	free_all(shared, tab);
 }
