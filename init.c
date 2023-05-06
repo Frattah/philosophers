@@ -18,12 +18,14 @@ t_philo	*philo_init(t_shared *shared, t_philo *philo, int arc, char **arv)
 	if (!philo)
 		return (NULL);
 	pthread_mutex_init(&philo->dx_fork, NULL);
-	philo->stats[1] = atoi(arv[1]);
-	philo->stats[2] = atoi(arv[2]);
-	philo->stats[3] = atoi(arv[3]);
-	philo->stats[4] = atoi(arv[4]);
+	pthread_mutex_init(&philo->lst_eat_mutex, NULL);
+	philo->stats[1] = ft_atoi(arv[1]);
+	philo->stats[2] = ft_atoi(arv[2]);
+	philo->stats[3] = ft_atoi(arv[3]);
+	philo->stats[4] = ft_atoi(arv[4]);
+	philo->lst_eat = 0;
 	if (arc == 6)
-		philo->stats[5] = atoi(arv[5]);
+		philo->stats[5] = ft_atoi(arv[5]);
 	philo->shared = shared;
 	return (philo);
 }
@@ -51,22 +53,13 @@ t_philo	**tab_init(t_shared *shared, int arc, char **arv)
 	return (tab);
 }
 
-t_shared	*shared_init(t_shared *shared, int phil_num)
+t_shared	*shared_init(t_shared *shared)
 {
-	int	i;
-
 	shared = (t_shared *) malloc(sizeof(t_shared));
 	if (!shared)
 		return (NULL);
 	shared->stop = 1;
-	shared->lst_eat = malloc(sizeof(long long int) * phil_num);
-	if (!shared->lst_eat)
-		return (NULL);
-	i = -1;
-	while (++i < phil_num)
-		shared->lst_eat[i] = 0;
 	pthread_mutex_init(&shared->stop_mutex, NULL);
 	pthread_mutex_init(&shared->print_mutex, NULL);
-	pthread_mutex_init(&shared->lst_eat_mutex, NULL);
 	return (shared);
 }

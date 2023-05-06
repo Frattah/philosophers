@@ -18,7 +18,7 @@ NAME	=	philo
 
 CC		=	gcc
 
-CFLAG	=	-fsanitize=thread -Wall -Werror -Wextra -pthread
+CFLAG	=	-Wall -Werror -Wextra -pthread
 
 all: $(NAME)
 

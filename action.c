@@ -30,9 +30,9 @@ void	waiting(pthread_mutex_t *stop_mutex, int *stop)
 void	death(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->shared->stop_mutex);
-	philo->shared->stop = 1;
-	pthread_mutex_lock(&philo->shared->stop_mutex);
 	print(philo, "is dead");
+	philo->shared->stop = 1;
+	pthread_mutex_unlock(&philo->shared->stop_mutex);
 }
 
 void	eat_and_sleep(t_philo *philo)
@@ -43,11 +43,11 @@ void	eat_and_sleep(t_philo *philo)
 	print(philo, "has taken a fork");
 	print(philo, "is eating");
 	my_usleep(philo->stats[3], philo->shared->init);
-	pthread_mutex_unlock(&philo->dx_fork);
 	pthread_mutex_unlock(philo->sx_fork);
-	pthread_mutex_lock(&philo->shared->lst_eat_mutex);
-	philo->shared->lst_eat[philo->stats[0] - 1] = get_time(philo->shared->init);
-	pthread_mutex_unlock(&philo->shared->lst_eat_mutex);
+	pthread_mutex_unlock(&philo->dx_fork);
+	pthread_mutex_lock(&philo->lst_eat_mutex);
+	philo->lst_eat = get_time(philo->shared->init);
+	pthread_mutex_unlock(&philo->lst_eat_mutex);
 	print(philo, "is sleeping");
 	my_usleep(philo->stats[4], philo->shared->init);
 }

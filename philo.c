@@ -42,6 +42,7 @@ void	free_all(t_shared *shared, t_philo **tab)
 	phil_num = tab[0]->stats[1];
 	while (++i < phil_num)
 	{
+		pthread_mutex_destroy(&tab[i]->lst_eat_mutex);
 		free(tab[i]);
 	}
 	free(tab);
@@ -58,7 +59,7 @@ int	main(int argc, char **argv)
 	int			i;
 
 	shared = NULL;
-	shared = shared_init(shared, atoi(argv[1]));
+	shared = shared_init(shared);
 	if (!shared)
 		return (1);
 	tab = tab_init(shared, argc, argv);
@@ -68,10 +69,11 @@ int	main(int argc, char **argv)
 	gettimeofday(&shared->init, NULL);
 	pthread_mutex_unlock(&shared->stop_mutex);
 	i = -1;
-	while (++i < atoi(argv[1]))
-	{
+	while (++i < ft_atoi(argv[1]))
 		pthread_join(tab[i]->th, NULL);
-	}
+	pthread_mutex_lock(&shared->stop_mutex);
+	shared->stop = 1;
+	pthread_mutex_unlock(&shared->stop_mutex);
 	pthread_join(control, NULL);
 	free_all(shared, tab);
 }
