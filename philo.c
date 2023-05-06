@@ -39,9 +39,10 @@ void	free_all(t_shared *shared, t_philo **tab)
 	int	phil_num;
 
 	i = -1;
-	phil_num = tab[0]->stats[1];
+	phil_num = tab[0]->phil_num;
 	while (++i < phil_num)
 	{
+		pthread_mutex_destroy(&tab[i]->dx_fork);
 		pthread_mutex_destroy(&tab[i]->lst_eat_mutex);
 		free(tab[i]);
 	}

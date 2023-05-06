@@ -19,13 +19,13 @@ t_philo	*philo_init(t_shared *shared, t_philo *philo, int arc, char **arv)
 		return (NULL);
 	pthread_mutex_init(&philo->dx_fork, NULL);
 	pthread_mutex_init(&philo->lst_eat_mutex, NULL);
-	philo->stats[1] = ft_atoi(arv[1]);
-	philo->stats[2] = ft_atoi(arv[2]);
-	philo->stats[3] = ft_atoi(arv[3]);
-	philo->stats[4] = ft_atoi(arv[4]);
+	philo->phil_num = ft_atoi(arv[1]);
+	philo->ttd = ft_atoi(arv[2]);
+	philo->tte = ft_atoi(arv[3]);
+	philo->tts = ft_atoi(arv[4]);
 	philo->lst_eat = 0;
 	if (arc == 6)
-		philo->stats[5] = ft_atoi(arv[5]);
+		philo->nme = ft_atoi(arv[5]);
 	philo->shared = shared;
 	return (philo);
 }
@@ -36,7 +36,7 @@ t_philo	**tab_init(t_shared *shared, int arc, char **arv)
 	int		i;
 	int		phil_num;
 
-	phil_num = atoi(arv[1]);
+	phil_num = ft_atoi(arv[1]);
 	tab = (t_philo **) malloc(sizeof(t_philo *) * phil_num);
 	if (!tab)
 		return (NULL);
@@ -44,7 +44,7 @@ t_philo	**tab_init(t_shared *shared, int arc, char **arv)
 	while (++i < phil_num)
 	{	
 		tab[i] = philo_init(shared, tab[i], arc, arv);
-		tab[i]->stats[0] = i + 1;
+		tab[i]->id = i + 1;
 		if (i != 0)
 			tab[i]->sx_fork = &tab[i - 1]->dx_fork;
 		pthread_create(&tab[i]->th, NULL, &philo_routine, (void *) tab[i]);

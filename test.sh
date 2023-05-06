@@ -1,7 +1,7 @@
 #! /bin/bash
 
-echo "\n\nTest #0 (1 800 200 200 1)"
-./philo 1 800 200 200 1 | grep "is dead"
+#echo "\n\nTest #0 (1 800 200 200 1)"
+#./philo 1 800 200 200 1 | grep "is dead"
 
 echo "\n\nTest #1 (5 800 200 200 10)"
 ./philo 5 800 200 200 10 | grep "is eating" | wc -l

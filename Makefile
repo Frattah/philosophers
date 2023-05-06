@@ -16,7 +16,7 @@ OBJS	=	$(SRCS:.c=.o)
 
 NAME	=	philo
 
-CC		=	gcc
+CC	=	gcc
 
 CFLAG	=	-Wall -Werror -Wextra -pthread
 

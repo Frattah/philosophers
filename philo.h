@@ -34,7 +34,12 @@ typedef struct s_philo
 	pthread_mutex_t	lst_eat_mutex;
 	long long int	lst_eat;
 	t_shared		*shared;
-	int				stats[6];
+	int				id;
+	int				phil_num;
+	int				ttd;
+	int				tte;
+	int				tts;
+	int				nme;
 }	t_philo;
 
 void			*philo_routine(void *arg);

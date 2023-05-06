@@ -19,17 +19,17 @@ void	*philo_routine(void *arg)
 
 	philo = (t_philo *) arg;
 	waiting(&philo->shared->stop_mutex, &philo->shared->stop);
-	if (philo->stats[0] % 2 == 0 && philo->stats[0] != philo->stats[1])
-		usleep(1000);
+	if (philo->id % 2 == 0)
+		usleep(1500);
 	tmp = 0;
 	i = -1;
-	if (philo->stats[1] == 1)
+	if (philo->phil_num == 1)
 	{
 		print(philo, "has taken a fork");
-		my_usleep(philo->stats[2] * 2, philo->shared->init);
+		my_usleep(philo->ttd * 2, philo->shared->init);
 		return (0);
 	}
-	while (!tmp && (++i < philo->stats[5] || !philo->stats[5]))
+	while (!tmp && (++i < philo->nme || !philo->nme))
 	{
 		print(philo, "is thinking");
 		pthread_mutex_lock(&philo->shared->stop_mutex);
@@ -43,12 +43,14 @@ void	*philo_routine(void *arg)
 void	death_control(t_philo **tab, t_shared *shared, int *tmp)
 {
 	int	i;
+	int	phil_num;
 
 	i = -1;
-	while (++i < tab[0]->stats[1] && *tmp == 0)
+	phil_num = tab[0]->phil_num;
+	while (++i < phil_num && *tmp == 0)
 	{
 		pthread_mutex_lock(&tab[i]->lst_eat_mutex);
-		if (get_time(shared->init) - tab[i]->lst_eat > tab[i]->stats[2])
+		if (get_time(shared->init) - tab[i]->lst_eat >= tab[i]->ttd)
 		{
 			pthread_mutex_unlock(&tab[i]->lst_eat_mutex);
 			death(tab[i]);

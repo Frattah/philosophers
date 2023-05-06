@@ -27,7 +27,7 @@ int	print(t_philo *philo, char *str)
 	if (strcmp(str, "is dead"))
 		pthread_mutex_unlock(&philo->shared->stop_mutex);
 	printf("%lld ms %d %s\n", get_time(philo->shared->init),
-		philo->stats[0], str);
+		philo->id, str);
 	pthread_mutex_unlock(&philo->shared->print_mutex);
 	return (0);
 }
@@ -52,8 +52,7 @@ int	ft_atoi(const char *str)
 	{
 		if (nb > 2147483647 / 10 || nb * 10 > 2147483647 - str[i] + '0')
 		{
-			write(2, "Error\n", 6);
-			exit(1);
+			return (0);
 		}
 		nb = (nb * 10) + str[i++] - '0';
 	}
