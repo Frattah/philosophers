@@ -20,7 +20,7 @@ void	*philo_routine(void *arg)
 	philo = (t_philo *) arg;
 	waiting(&philo->shared->stop_mutex, &philo->shared->stop);
 	if (philo->id % 2 == 0)
-		usleep(1500);
+		usleep(2000);
 	tmp = 0;
 	i = -1;
 	if (philo->phil_num == 1)

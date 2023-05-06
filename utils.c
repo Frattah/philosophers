@@ -16,7 +16,7 @@
 int	print(t_philo *philo, char *str)
 {
 	pthread_mutex_lock(&philo->shared->print_mutex);
-	if (strcmp(str, "is dead"))
+	if (strcmp(str, "died"))
 		pthread_mutex_lock(&philo->shared->stop_mutex);
 	if (philo->shared->stop == 1)
 	{
@@ -24,9 +24,9 @@ int	print(t_philo *philo, char *str)
 		pthread_mutex_unlock(&philo->shared->print_mutex);
 		return (1);
 	}
-	if (strcmp(str, "is dead"))
+	if (strcmp(str, "died"))
 		pthread_mutex_unlock(&philo->shared->stop_mutex);
-	printf("%lld ms %d %s\n", get_time(philo->shared->init),
+	printf("%lld %d %s\n", get_time(philo->shared->init),
 		philo->id, str);
 	pthread_mutex_unlock(&philo->shared->print_mutex);
 	return (0);
