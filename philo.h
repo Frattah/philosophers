@@ -72,4 +72,6 @@ int				ft_atoi(const char *str);
 
 int				ft_strncmp(const char *s1, const char *s2, int n);
 
+int				error_managment(int argc, char **argv);
+
 #endif

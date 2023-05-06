@@ -70,3 +70,18 @@ int	ft_strncmp(const char *s1, const char *s2, int n)
 		i++;
 	return ((unsigned char) s1[i] - (unsigned char) s2[i]);
 }
+
+int	error_managment(int argc, char **argv)
+{
+	if (argc != 5 && argc != 6)
+		return (write (2, "Error: Invalid number of parameters\n", 37));
+	while (--argc)
+	{
+		if (ft_atoi(argv[argc]) <= 0)
+		{
+			write(2, "Error: Invalid parameter\n", 25);
+			return (1);
+		}
+	}
+	return (0);
+}
