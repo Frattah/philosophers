@@ -35,7 +35,7 @@ void	death(t_philo *philo)
 	pthread_mutex_unlock(&philo->shared->stop_mutex);
 }
 
-void	eat_and_sleep(t_philo *philo)
+void	eat(t_philo *philo, int i)
 {
 	pthread_mutex_lock(&philo->dx_fork);
 	print(philo, "has taken a fork");
@@ -46,8 +46,9 @@ void	eat_and_sleep(t_philo *philo)
 	pthread_mutex_unlock(philo->sx_fork);
 	pthread_mutex_unlock(&philo->dx_fork);
 	pthread_mutex_lock(&philo->lst_eat_mutex);
-	philo->lst_eat = get_time(philo->shared->init);
+	if (i == philo->nme - 1)
+		philo->lst_eat = -1;
+	else
+		philo->lst_eat = get_time(philo->shared->init);
 	pthread_mutex_unlock(&philo->lst_eat_mutex);
-	print(philo, "is sleeping");
-	my_usleep(philo->tts, philo->shared->init);
 }

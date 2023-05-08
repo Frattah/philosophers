@@ -35,7 +35,9 @@ void	*philo_routine(void *arg)
 		pthread_mutex_lock(&philo->shared->stop_mutex);
 		tmp = philo->shared->stop;
 		pthread_mutex_unlock(&philo->shared->stop_mutex);
-		eat_and_sleep(philo);
+		eat(philo, i);
+		print(philo, "is sleeping");
+		my_usleep(philo->tts, philo->shared->init);
 	}
 	return (0);
 }
@@ -50,7 +52,8 @@ void	death_control(t_philo **tab, t_shared *shared, int *tmp)
 	while (++i < phil_num && *tmp == 0)
 	{
 		pthread_mutex_lock(&tab[i]->lst_eat_mutex);
-		if (get_time(shared->init) - tab[i]->lst_eat >= tab[i]->ttd)
+		if (get_time(shared->init) - tab[i]->lst_eat >= tab[i]->ttd
+		    && tab[i]->lst_eat != -1)
 		{
 			pthread_mutex_unlock(&tab[i]->lst_eat_mutex);
 			death(tab[i]);

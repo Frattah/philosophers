@@ -16,28 +16,48 @@ echo "\n\nTest #4 (1 800 200 200 1)"
 ./philo 1 800 200 200 1 | grep "died"
 
 echo "\n\nTest #5 (5 800 200 200 5)"
-./philo 5 800 200 200 5 | grep "is eating" | wc -l
-./philo 5 800 200 200 5 | grep "died"
+rm -rf logs
+./philo 5 800 200 200 5 > logs
+grep "is eating" logs | wc -l
+grep "died" logs
 
 echo "\n\nTest #6 (5 300 200 120 1)"
-./philo 5 300 200 120 1 | grep "died"
+rm -rf logs
+./philo 5 300 200 120 1 > logs
+grep "is eating" logs | wc -l
+grep "died" logs
 
 echo "\n\nTest #7 (4 410 200 200 5)"
-./philo 4 410 200 200 5 | grep "is eating" | wc -l
-./philo 4 800 200 200 5 | grep "died"
+rm -rf logs
+./philo 4 410 200 200 5 > logs
+grep "is eating" logs | wc -l
+grep "died" logs
+
 
 echo "\n\nTest #8 (4 310 200 100 10)"
-./philo 4 310 200 100 10 | grep "died"
+rm -rf logs
+./philo 4 310 200 100 10 > logs
+grep "is eating" logs | wc -l
+grep "died" logs
+
 
 echo "\n\nTest #9 (20 800 200 200 1)"
-./philo 20 800 200 200 1 | grep "is eating" | wc -l
-./philo 20 800 200 200 1 | grep "died"
+rm -rf logs
+./philo 20 800 200 200 1 > logs
+grep "is eating" logs | wc -l
+grep "died" logs
+
 
 echo "\n\nTest #10 (50 800 200 200 1)"
-./philo 50 800 200 200 1 | grep "is eating" | wc -l 
-./philo 50 800 200 200 1 | grep "died"
+rm -rf logs
+./philo 50 800 200 200 1 > logs
+grep "is eating" logs | wc -l
+grep "died" logs
 
 echo "\n\nTest #11 (3 410 200 200)"
-./philo 3 410 200 200 | grep "died"
+rm -rf logs
+./philo 3 410 200 200 > logs
+grep "is eating" logs | wc -l
+grep "died" logs
 
 echo "\n"

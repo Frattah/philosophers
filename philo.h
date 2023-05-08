@@ -62,7 +62,7 @@ t_shared		*shared_init(t_shared *shared);
 
 void			waiting(pthread_mutex_t *stop_mutex, int *stop);
 
-void			eat_and_sleep(t_philo *philo);
+void			eat(t_philo *philo, int i);
 
 void			death(t_philo *philo);
 
