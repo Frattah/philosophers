@@ -13,18 +13,18 @@
 #include "philo.h"
 #include <string.h>
 
-int	print(t_philo *philo, char *str)
+void	print(t_philo *philo, char *str)
 {
 	pthread_mutex_lock(&philo->shared->stop_mutex);
 	if (philo->shared->stop == 1)
 	{
 		pthread_mutex_unlock(&philo->shared->stop_mutex);
-		return (1);
+		return ;
 	}
 	pthread_mutex_unlock(&philo->shared->stop_mutex);
 	printf("%lld %d %s\n", get_time(philo->shared->init),
 		philo->id, str);
-	return (0);
+	return ;
 }
 
 int	ft_atoi(const char *str)

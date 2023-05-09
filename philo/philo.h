@@ -12,11 +12,15 @@
 
 #ifndef PHILO_H
 # define PHILO_H
-# include <stdio.h>
-# include <stdlib.h>
-# include <unistd.h>
-# include <pthread.h>
-# include <sys/time.h>
+# include <stdio.h>	// printf
+# include <stdlib.h>	// malloc free
+# include <unistd.h>	// usleep
+# include <pthread.h>	// pthread_create pthread_destroy pthread_mutex_init
+			// pthread_mutex_lock pthread_mutex_unlock
+			// pthread_mutex_destroy
+# include <sys/time.h>	// gettimeofday
+
+// -------- Resources shared by threads ---------
 
 typedef struct s_shared
 {	
@@ -24,6 +28,8 @@ typedef struct s_shared
 	pthread_mutex_t	stop_mutex;
 	struct timeval	init;
 }	t_shared;
+
+// -------- Philosopher structure ---------------
 
 typedef struct s_philo
 {
@@ -41,40 +47,52 @@ typedef struct s_philo
 	int				nme;
 }	t_philo;
 
-void			*philo_routine(void *arg);
+// -------- Action of philosophers ---------------
 
-void			death_control(t_philo **tab, t_shared *shared, int *tmp);
+void	waiting(pthread_mutex_t *stop_mutex, int *stop);
 
-void			*control_routine(void *arg);
+void	death(t_philo *philo);
 
-void			free_all(t_shared *shared, t_philo **tab);
+void	eat(t_philo *philo, int i);
 
-void			my_usleep(int mms, struct timeval init);
+// -------- Initialization functions -------------
 
-long long int	get_time(struct timeval init);
+t_philo	*philo_init(t_shared *shared, t_philo *philo, int arc, char **arv);
 
-t_philo			*philo_init(t_shared *s, t_philo *p, int a, char **c);
-
-t_philo			**tab_init(t_shared *shared, int argc, char **argv);
+t_philo	**tab_init(t_shared *shared, int arc, char **arv);
 
 t_shared		*shared_init(t_shared *shared);
 
-void			waiting(pthread_mutex_t *stop_mutex, int *stop);
+// -------- Simulation foundamentals -------------
 
-void			eat(t_philo *philo, int i);
+long long int			get_time(struct timeval init);
 
-void			death(t_philo *philo);
+void	my_usleep(int mms, struct timeval init);
 
-int				print(t_philo *philo, char *str);
+void	free_all(t_shared *shared, t_philo **tab);
 
-int				ft_atoi(const char *str);
+void	launch_simulation(t_shared *shared, t_philo **tab);
 
-int				ft_strncmp(const char *s1, const char *s2, int n);
+// -------- Threads routines ---------------------
 
-int				error_managment(int argc, char **argv);
+void	*philo_routine(void *arg);
 
-void			odd_routine(t_philo *philo, int i);
+void	odd_routine(t_philo *philo, int i);
 
-void			even_routine(t_philo *philo, int i);
+void	even_routine(t_philo *philo, int i);
+
+void	death_control(t_philo **tab, t_shared *shared, int *tmp);
+
+void	*control_routine(void *arg);
+
+// -------- Utilities and error managment --------
+
+void	print(t_philo *philo, char *str);
+
+int		ft_atoi(const char *str);
+
+int		ft_strncmp(const char *s1, const char *s2, int n);
+
+int		error_managment(int argc, char **argv);
 
 #endif

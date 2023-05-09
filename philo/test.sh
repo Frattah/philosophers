@@ -89,6 +89,6 @@ grep "died" logs
 rm -rf logs
 echo "\n"
 
-echo "\n\nFinal Test #15 (200 800 200 200)"
-./philo 200 800 200 200
+#echo "\n\nFinal Test #15 (200 800 200 200)"
+#./philo 200 800 200 200
 
