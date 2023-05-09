@@ -19,27 +19,48 @@ void	*philo_routine(void *arg)
 
 	philo = (t_philo *) arg;
 	waiting(&philo->shared->stop_mutex, &philo->shared->stop);
-	if (philo->id % 2 == 0)
-		usleep(2000);
 	tmp = 0;
 	i = -1;
 	if (philo->phil_num == 1)
 	{
 		print(philo, "has taken a fork");
-		my_usleep(philo->ttd * 2, philo->shared->init);
+		my_usleep(philo->ttd * 1.2, philo->shared->init);
 		return (0);
 	}
 	while (!tmp && (++i < philo->nme || !philo->nme))
 	{
-		print(philo, "is thinking");
+		if (philo->id % 2 == 0)
+			even_routine(philo, i);
+		else
+			odd_routine(philo, i);
 		pthread_mutex_lock(&philo->shared->stop_mutex);
 		tmp = philo->shared->stop;
 		pthread_mutex_unlock(&philo->shared->stop_mutex);
-		eat(philo, i);
-		print(philo, "is sleeping");
-		my_usleep(philo->tts, philo->shared->init);
 	}
 	return (0);
+}
+
+void	odd_routine(t_philo *philo, int i)
+{
+	eat(philo, i);
+	print(philo, "is sleeping");
+	my_usleep(philo->tts, philo->shared->init);
+	print(philo, "is thinking");
+	my_usleep(philo->tte - philo->tts, philo->shared->init);
+}
+
+void	even_routine(t_philo *philo, int i)
+{
+	int	sleep_time;
+
+	print(philo, "is thinking");
+	sleep_time = philo->tte - philo->tts;
+	if (i == 0)
+		sleep_time = philo->tte;
+	my_usleep(sleep_time, philo->shared->init);
+	eat(philo, i);
+	print(philo, "is sleeping");
+	my_usleep(philo->tts, philo->shared->init);
 }
 
 void	death_control(t_philo **tab, t_shared *shared, int *tmp)
@@ -52,14 +73,15 @@ void	death_control(t_philo **tab, t_shared *shared, int *tmp)
 	while (++i < phil_num && *tmp == 0)
 	{
 		pthread_mutex_lock(&tab[i]->lst_eat_mutex);
-		if (get_time(shared->init) - tab[i]->lst_eat >= tab[i]->ttd
-		    && tab[i]->lst_eat != -1)
+		if (get_time(shared->init) - tab[i]->lst_eat > tab[i]->ttd
+			&& tab[i]->lst_eat != -1)
 		{
 			pthread_mutex_unlock(&tab[i]->lst_eat_mutex);
 			death(tab[i]);
 		}
 		else
 			pthread_mutex_unlock(&tab[i]->lst_eat_mutex);
+		usleep(20);
 		pthread_mutex_lock(&shared->stop_mutex);
 		*tmp = shared->stop;
 		pthread_mutex_unlock(&shared->stop_mutex);

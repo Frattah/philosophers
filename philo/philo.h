@@ -22,7 +22,6 @@ typedef struct s_shared
 {	
 	int				stop;
 	pthread_mutex_t	stop_mutex;
-	pthread_mutex_t	print_mutex;
 	struct timeval	init;
 }	t_shared;
 
@@ -73,5 +72,9 @@ int				ft_atoi(const char *str);
 int				ft_strncmp(const char *s1, const char *s2, int n);
 
 int				error_managment(int argc, char **argv);
+
+void			odd_routine(t_philo *philo, int i);
+
+void			even_routine(t_philo *philo, int i);
 
 #endif

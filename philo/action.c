@@ -30,7 +30,8 @@ void	waiting(pthread_mutex_t *stop_mutex, int *stop)
 void	death(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->shared->stop_mutex);
-	print(philo, "died");
+	printf("%lld %d is died\n", get_time(philo->shared->init), philo->id);
+	printf("	%s\n", "\U0001f480");
 	philo->shared->stop = 1;
 	pthread_mutex_unlock(&philo->shared->stop_mutex);
 }

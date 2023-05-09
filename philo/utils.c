@@ -15,20 +15,15 @@
 
 int	print(t_philo *philo, char *str)
 {
-	pthread_mutex_lock(&philo->shared->print_mutex);
-	if (strcmp(str, "died"))
-		pthread_mutex_lock(&philo->shared->stop_mutex);
+	pthread_mutex_lock(&philo->shared->stop_mutex);
 	if (philo->shared->stop == 1)
 	{
 		pthread_mutex_unlock(&philo->shared->stop_mutex);
-		pthread_mutex_unlock(&philo->shared->print_mutex);
 		return (1);
 	}
-	if (strcmp(str, "died"))
-		pthread_mutex_unlock(&philo->shared->stop_mutex);
+	pthread_mutex_unlock(&philo->shared->stop_mutex);
 	printf("%lld %d %s\n", get_time(philo->shared->init),
 		philo->id, str);
-	pthread_mutex_unlock(&philo->shared->print_mutex);
 	return (0);
 }
 
@@ -73,14 +68,19 @@ int	ft_strncmp(const char *s1, const char *s2, int n)
 
 int	error_managment(int argc, char **argv)
 {
+	int	i;
+
 	if (argc != 5 && argc != 6)
 		return (write (2, "Error: Invalid number of parameters\n", 37));
 	while (--argc)
 	{
 		if (ft_atoi(argv[argc]) <= 0)
-		{
-			write(2, "Error: Invalid parameter\n", 25);
-			return (1);
+			return (write(2, "Error: Invalid parameter\n", 25));
+		i = -1;
+		while (argv[argc][++i] != '\0')
+		{	
+			if (argv[argc][i] < '0' || argv[argc][i] > '9')
+				return (write(2, "Error: Invalid parameter\n", 25));
 		}
 	}
 	return (0);

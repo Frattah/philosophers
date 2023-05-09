@@ -60,6 +60,5 @@ t_shared	*shared_init(t_shared *shared)
 		return (NULL);
 	shared->stop = 1;
 	pthread_mutex_init(&shared->stop_mutex, NULL);
-	pthread_mutex_init(&shared->print_mutex, NULL);
 	return (shared);
 }

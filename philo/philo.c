@@ -29,7 +29,7 @@ void	my_usleep(int mms, struct timeval init)
 	long long int	ref;
 
 	ref = get_time(init);
-	while (get_time(init) - ref != mms)
+	while (get_time(init) - ref < mms)
 		usleep(10);
 }
 
@@ -48,7 +48,6 @@ void	free_all(t_shared *shared, t_philo **tab)
 	}
 	free(tab);
 	pthread_mutex_destroy(&shared->stop_mutex);
-	pthread_mutex_destroy(&shared->print_mutex);
 	free(shared);
 }
 
@@ -66,7 +65,9 @@ void	launch_simulation(t_shared *shared, t_philo **tab)
 	pthread_mutex_unlock(&shared->stop_mutex);
 	i = -1;
 	while (++i < phil_num)
+	{
 		pthread_join(tab[i]->th, NULL);
+	}
 	pthread_mutex_lock(&shared->stop_mutex);
 	shared->stop = 1;
 	pthread_mutex_unlock(&shared->stop_mutex);
