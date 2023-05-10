@@ -26,6 +26,7 @@ typedef struct s_shared
 {	
 	int				stop;
 	pthread_mutex_t	stop_mutex;
+	pthread_mutex_t	print_mutex;
 	struct timeval	init;
 }	t_shared;
 

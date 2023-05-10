@@ -23,6 +23,7 @@ t_philo	*philo_init(t_shared *shared, t_philo *philo, int arc, char **arv)
 	philo->ttd = ft_atoi(arv[2]);
 	philo->tte = ft_atoi(arv[3]);
 	philo->tts = ft_atoi(arv[4]);
+	philo->nme = 0;
 	philo->lst_eat = 0;
 	if (arc == 6)
 		philo->nme = ft_atoi(arv[5]);
@@ -60,5 +61,6 @@ t_shared	*shared_init(t_shared *shared)
 		return (NULL);
 	shared->stop = 1;
 	pthread_mutex_init(&shared->stop_mutex, NULL);
+	pthread_mutex_init(&shared->print_mutex, NULL);
 	return (shared);
 }

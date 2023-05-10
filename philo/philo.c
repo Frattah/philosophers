@@ -48,6 +48,7 @@ void	free_all(t_shared *shared, t_philo **tab)
 	}
 	free(tab);
 	pthread_mutex_destroy(&shared->stop_mutex);
+	pthread_mutex_destroy(&shared->print_mutex);
 	free(shared);
 }
 
