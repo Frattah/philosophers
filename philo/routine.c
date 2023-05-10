@@ -42,22 +42,33 @@ void	*philo_routine(void *arg)
 
 void	odd_routine(t_philo *philo, int i)
 {
+	int	think_time;
+
+	pthread_mutex_lock(&philo->lst_eat_mutex);
+	philo->lst_eat = get_time(philo->shared->init);
+	pthread_mutex_unlock(&philo->lst_eat_mutex);
 	eat(philo, i);
 	print(philo, "is sleeping");
 	my_usleep(philo->tts, philo->shared->init);
 	print(philo, "is thinking");
-	my_usleep(philo->tte - philo->tts, philo->shared->init);
+	think_time = philo->tte - philo->tts;
+	if (think_time > 0)
+		my_usleep(philo->tte - philo->tts, philo->shared->init);
 }
 
 void	even_routine(t_philo *philo, int i)
 {
-	int	sleep_time;
+	int	think_time;
 
 	print(philo, "is thinking");
-	sleep_time = philo->tte - philo->tts;
+	pthread_mutex_lock(&philo->lst_eat_mutex);
+	philo->lst_eat = get_time(philo->shared->init);
+	pthread_mutex_unlock(&philo->lst_eat_mutex);
+	think_time = philo->tte - philo->tts;
 	if (i == 0)
-		sleep_time = philo->tte;
-	my_usleep(sleep_time, philo->shared->init);
+		think_time = philo->tte;
+	if (think_time > 0)
+		my_usleep(think_time, philo->shared->init);
 	eat(philo, i);
 	print(philo, "is sleeping");
 	my_usleep(philo->tts, philo->shared->init);

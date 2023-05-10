@@ -29,11 +29,13 @@ void	waiting(pthread_mutex_t *stop_mutex, int *stop)
 
 void	death(t_philo *philo)
 {
+	pthread_mutex_lock(&philo->shared->print_mutex);
 	pthread_mutex_lock(&philo->shared->stop_mutex);
 	printf("%lld %d is died\n", get_time(philo->shared->init), philo->id);
 	printf("	%s\n", "\U0001f480");
 	philo->shared->stop = 1;
 	pthread_mutex_unlock(&philo->shared->stop_mutex);
+	pthread_mutex_unlock(&philo->shared->print_mutex);
 }
 
 void	eat(t_philo *philo, int i)
@@ -44,12 +46,12 @@ void	eat(t_philo *philo, int i)
 	print(philo, "has taken a fork");
 	print(philo, "is eating");
 	my_usleep(philo->tte, philo->shared->init);
-	pthread_mutex_unlock(philo->sx_fork);
-	pthread_mutex_unlock(&philo->dx_fork);
-	pthread_mutex_lock(&philo->lst_eat_mutex);
 	if (i == philo->nme - 1)
 		philo->lst_eat = -1;
 	else
 		philo->lst_eat = get_time(philo->shared->init);
+	pthread_mutex_unlock(philo->sx_fork);
+	pthread_mutex_unlock(&philo->dx_fork);
+	pthread_mutex_lock(&philo->lst_eat_mutex);
 	pthread_mutex_unlock(&philo->lst_eat_mutex);
 }

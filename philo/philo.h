@@ -62,11 +62,11 @@ t_philo	*philo_init(t_shared *shared, t_philo *philo, int arc, char **arv);
 
 t_philo	**tab_init(t_shared *shared, int arc, char **arv);
 
-t_shared		*shared_init(t_shared *shared);
+t_shared	*shared_init(t_shared *shared);
 
 // -------- Simulation foundamentals -------------
 
-long long int			get_time(struct timeval init);
+long long int	get_time(struct timeval init);
 
 void	my_usleep(int mms, struct timeval init);
 
