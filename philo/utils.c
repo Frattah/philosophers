@@ -15,16 +15,16 @@
 
 void	print(t_philo *philo, char *str)
 {
+	pthread_mutex_lock(&philo->shared->print_mutex);
 	pthread_mutex_lock(&philo->shared->stop_mutex);
 	if (philo->shared->stop == 1)
 	{
 		pthread_mutex_unlock(&philo->shared->stop_mutex);
 		return ;
 	}
-	pthread_mutex_unlock(&philo->shared->stop_mutex);
-	pthread_mutex_lock(&philo->shared->print_mutex);
 	printf("%lld %d %s\n", get_time(philo->shared->init),
 		philo->id, str);
+	pthread_mutex_unlock(&philo->shared->stop_mutex);
 	pthread_mutex_unlock(&philo->shared->print_mutex);
 	return ;
 }

@@ -44,9 +44,6 @@ void	odd_routine(t_philo *philo, int i)
 {
 	int	think_time;
 
-	pthread_mutex_lock(&philo->lst_eat_mutex);
-	philo->lst_eat = get_time(philo->shared->init);
-	pthread_mutex_unlock(&philo->lst_eat_mutex);
 	eat(philo, i);
 	print(philo, "is sleeping");
 	my_usleep(philo->tts, philo->shared->init);
@@ -61,9 +58,6 @@ void	even_routine(t_philo *philo, int i)
 	int	think_time;
 
 	print(philo, "is thinking");
-	pthread_mutex_lock(&philo->lst_eat_mutex);
-	philo->lst_eat = get_time(philo->shared->init);
-	pthread_mutex_unlock(&philo->lst_eat_mutex);
 	think_time = philo->tte - philo->tts;
 	if (i == 0)
 		think_time = philo->tte;
