@@ -1,81 +1,76 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo.c                                            :+:      :+:    :+:   */
+/*   routine.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: frmonfre <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 09:35:02 by frmonfre          #+#    #+#             */
-/*   Updated: 2023/05/05 11:56:46 by frmonfre         ###   ########.fr       */
+/*   Updated: 2023/05/15 09:50:18 by frmonfre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "philo.h"
 
-void	*philo_routine(void *arg)
+void	*phi_routine(void *arg)
 {
-	t_philo		*philo;
+	t_phi		*phi;
 	int			i;
-	int			tmp;
 
-	philo = (t_philo *) arg;
-	waiting(&philo->shared->stop_mutex, &philo->shared->stop);
-	tmp = 0;
+	phi = (t_phi *) arg;
+	waiting(&phi->shared->stop_mutex, &phi->shared->stop);
 	i = -1;
-	if (philo->phil_num == 1)
+	if (phi->phil_num == 1)
 	{
-		print(philo, "has taken a fork");
-		my_usleep(philo->ttd * 1.2, philo->shared->init);
+		print(phi, "has taken a fork");
+		my_usleep(phi->ttd * 1.2, phi->shared);
 		return (0);
 	}
-	while (!tmp && (++i < philo->nme || !philo->nme))
+	while (!is_end(phi->shared) && (++i < phi->nme || !phi->nme))
 	{
-		if (philo->id % 2 == 0)
-			even_routine(philo, i);
+		if (phi->id % 2 == 0)
+			even_routine(phi, i);
 		else
-			odd_routine(philo, i);
-		pthread_mutex_lock(&philo->shared->stop_mutex);
-		tmp = philo->shared->stop;
-		pthread_mutex_unlock(&philo->shared->stop_mutex);
+			odd_routine(phi, i);
 	}
 	return (0);
 }
 
-void	odd_routine(t_philo *philo, int i)
+void	odd_routine(t_phi *phi, int i)
 {
 	int	think_time;
 
-	eat(philo, i);
-	print(philo, "is sleeping");
-	my_usleep(philo->tts, philo->shared->init);
-	print(philo, "is thinking");
-	think_time = philo->tte - philo->tts;
+	eat(phi, i);
+	print(phi, "is sleeping");
+	my_usleep(phi->tts, phi->shared);
+	print(phi, "is thinking");
+	think_time = phi->tte - phi->tts;
 	if (think_time > 0)
-		my_usleep(philo->tte - philo->tts, philo->shared->init);
+		my_usleep(phi->tte - phi->tts, phi->shared);
 }
 
-void	even_routine(t_philo *philo, int i)
+void	even_routine(t_phi *phi, int i)
 {
 	int	think_time;
 
-	print(philo, "is thinking");
-	think_time = philo->tte - philo->tts;
+	print(phi, "is thinking");
+	think_time = phi->tte - phi->tts;
 	if (i == 0)
-		think_time = philo->tte;
+		think_time = phi->tte;
 	if (think_time > 0)
-		my_usleep(think_time, philo->shared->init);
-	eat(philo, i);
-	print(philo, "is sleeping");
-	my_usleep(philo->tts, philo->shared->init);
+		my_usleep(think_time, phi->shared);
+	eat(phi, i);
+	print(phi, "is sleeping");
+	my_usleep(phi->tts, phi->shared);
 }
 
-void	death_control(t_philo **tab, t_shared *shared, int *tmp)
+void	death_control(t_phi **tab, t_shared *shared)
 {
 	int	i;
 	int	phil_num;
 
 	i = -1;
 	phil_num = tab[0]->phil_num;
-	while (++i < phil_num && *tmp == 0)
+	while (++i < phil_num && !is_end(shared))
 	{
 		pthread_mutex_lock(&tab[i]->lst_eat_mutex);
 		if (get_time(shared->init) - tab[i]->lst_eat > tab[i]->ttd
@@ -87,23 +82,18 @@ void	death_control(t_philo **tab, t_shared *shared, int *tmp)
 		else
 			pthread_mutex_unlock(&tab[i]->lst_eat_mutex);
 		usleep(20);
-		pthread_mutex_lock(&shared->stop_mutex);
-		*tmp = shared->stop;
-		pthread_mutex_unlock(&shared->stop_mutex);
 	}
 }
 
 void	*control_routine(void *arg)
 {
-	t_philo		**tab;
+	t_phi		**tab;
 	t_shared	*shared;
-	int			tmp;
 
-	tab = (t_philo **) arg;
-	tmp = 0;
+	tab = (t_phi **) arg;
 	shared = tab[0]->shared;
 	waiting(&shared->stop_mutex, &shared->stop);
-	while (tmp == 0)
-		death_control(tab, shared, &tmp);
+	while (!is_end(shared))
+		death_control(tab, shared);
 	return (0);
 }

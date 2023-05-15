@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo.c                                            :+:      :+:    :+:   */
+/*   action.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: frmonfre <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 09:35:02 by frmonfre          #+#    #+#             */
-/*   Updated: 2023/05/05 11:57:55 by frmonfre         ###   ########.fr       */
+/*   Updated: 2023/05/15 09:48:24 by frmonfre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,31 +27,30 @@ void	waiting(pthread_mutex_t *stop_mutex, int *stop)
 	}
 }
 
-void	death(t_philo *philo)
+void	death(t_phi *phi)
 {
-	pthread_mutex_lock(&philo->shared->print_mutex);
-	pthread_mutex_lock(&philo->shared->stop_mutex);
-	printf("%lld %d is died\n", get_time(philo->shared->init), philo->id);
-	printf("	%s\n", "\U0001f480");
-	philo->shared->stop = 1;
-	pthread_mutex_unlock(&philo->shared->stop_mutex);
-	pthread_mutex_unlock(&philo->shared->print_mutex);
+	pthread_mutex_lock(&phi->shared->print_mutex);
+	pthread_mutex_lock(&phi->shared->stop_mutex);
+	printf("%lld %d is died\n", get_time(phi->shared->init), phi->id);
+	phi->shared->stop = 1;
+	pthread_mutex_unlock(&phi->shared->stop_mutex);
+	pthread_mutex_unlock(&phi->shared->print_mutex);
 }
 
-void	eat(t_philo *philo, int i)
+void	eat(t_phi *phi, int i)
 {
-	pthread_mutex_lock(&philo->dx_fork);
-	print(philo, "has taken a fork");
-	pthread_mutex_lock(philo->sx_fork);
-	print(philo, "has taken a fork");
-	print(philo, "is eating");
-	my_usleep(philo->tte, philo->shared->init);
-	if (i == philo->nme - 1)
-		philo->lst_eat = -1;
+	pthread_mutex_lock(&phi->dx_fork);
+	print(phi, "has taken a fork");
+	pthread_mutex_lock(phi->sx_fork);
+	print(phi, "has taken a fork");
+	print(phi, "is eating");
+	my_usleep(phi->tte, phi->shared);
+	pthread_mutex_lock(&phi->lst_eat_mutex);
+	if (i == phi->nme - 1)
+		phi->lst_eat = -1;
 	else
-		philo->lst_eat = get_time(philo->shared->init);
-	pthread_mutex_unlock(philo->sx_fork);
-	pthread_mutex_unlock(&philo->dx_fork);
-	pthread_mutex_lock(&philo->lst_eat_mutex);
-	pthread_mutex_unlock(&philo->lst_eat_mutex);
+		phi->lst_eat = get_time(phi->shared->init);
+	pthread_mutex_unlock(&phi->lst_eat_mutex);
+	pthread_mutex_unlock(phi->sx_fork);
+	pthread_mutex_unlock(&phi->dx_fork);
 }

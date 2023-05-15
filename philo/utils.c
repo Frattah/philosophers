@@ -6,26 +6,24 @@
 /*   By: frmonfre <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 11:38:04 by frmonfre          #+#    #+#             */
-/*   Updated: 2023/05/05 11:10:57 by frmonfre         ###   ########.fr       */
+/*   Updated: 2023/05/15 09:45:49 by frmonfre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 #include <string.h>
 
-void	print(t_philo *philo, char *str)
+void	print(t_phi *phi, char *str)
 {
-	pthread_mutex_lock(&philo->shared->print_mutex);
-	pthread_mutex_lock(&philo->shared->stop_mutex);
-	if (philo->shared->stop == 1)
+	pthread_mutex_lock(&phi->shared->print_mutex);
+	if (is_end(phi->shared))
 	{
-		pthread_mutex_unlock(&philo->shared->stop_mutex);
+		pthread_mutex_unlock(&phi->shared->print_mutex);
 		return ;
 	}
-	printf("%lld %d %s\n", get_time(philo->shared->init),
-		philo->id, str);
-	pthread_mutex_unlock(&philo->shared->stop_mutex);
-	pthread_mutex_unlock(&philo->shared->print_mutex);
+	printf("%lld %d %s\n", get_time(phi->shared->init),
+		phi->id, str);
+	pthread_mutex_unlock(&phi->shared->print_mutex);
 	return ;
 }
 
@@ -86,4 +84,14 @@ int	error_managment(int argc, char **argv)
 		}
 	}
 	return (0);
+}
+
+int	is_end(t_shared	*shared)
+{
+	int	tmp;
+
+	pthread_mutex_lock(&shared->stop_mutex);
+	tmp = shared->stop;
+	pthread_mutex_unlock(&shared->stop_mutex);
+	return (tmp);
 }

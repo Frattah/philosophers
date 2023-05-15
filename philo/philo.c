@@ -6,7 +6,7 @@
 /*   By: frmonfre <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 09:35:02 by frmonfre          #+#    #+#             */
-/*   Updated: 2023/05/05 11:31:49 by frmonfre         ###   ########.fr       */
+/*   Updated: 2023/05/15 09:55:01 by frmonfre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,16 +24,16 @@ long long int	get_time(struct timeval init)
 	return (actual_mms - init_mms);
 }
 
-void	my_usleep(int mms, struct timeval init)
+void	my_usleep(int mms, t_shared *shared)
 {
 	long long int	ref;
 
-	ref = get_time(init);
-	while (get_time(init) - ref < mms)
+	ref = get_time(shared->init);
+	while (!is_end(shared) && get_time(shared->init) - ref < mms)
 		usleep(10);
 }
 
-void	free_all(t_shared *shared, t_philo **tab)
+void	free_all(t_shared *shared, t_phi **tab)
 {
 	int	i;
 	int	phil_num;
@@ -52,7 +52,7 @@ void	free_all(t_shared *shared, t_philo **tab)
 	free(shared);
 }
 
-void	launch_simulation(t_shared *shared, t_philo **tab)
+void	launch_simulation(t_shared *shared, t_phi **tab)
 {
 	int			phil_num;
 	int			i;
@@ -66,9 +66,7 @@ void	launch_simulation(t_shared *shared, t_philo **tab)
 	pthread_mutex_unlock(&shared->stop_mutex);
 	i = -1;
 	while (++i < phil_num)
-	{
 		pthread_join(tab[i]->th, NULL);
-	}
 	pthread_mutex_lock(&shared->stop_mutex);
 	shared->stop = 1;
 	pthread_mutex_unlock(&shared->stop_mutex);
@@ -78,7 +76,7 @@ void	launch_simulation(t_shared *shared, t_philo **tab)
 int	main(int argc, char **argv)
 {
 	t_shared	*shared;
-	t_philo		**tab;
+	t_phi		**tab;
 
 	if (error_managment(argc, argv))
 		return (1);

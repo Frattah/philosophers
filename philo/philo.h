@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philosophers.h                                     :+:      :+:    :+:   */
+/*   phi.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: frmonfre <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 08:38:28 by frmonfre          #+#    #+#             */
-/*   Updated: 2023/05/05 11:57:08 by frmonfre         ###   ########.fr       */
+/*   Updated: 2023/05/15 10:02:45 by frmonfre         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,9 @@ typedef struct s_shared
 	struct timeval	init;
 }	t_shared;
 
-// -------- Philosopher structure ---------------
+// -------- phisopher structure ---------------
 
-typedef struct s_philo
+typedef struct s_phi
 {
 	pthread_t		th;
 	pthread_mutex_t	dx_fork;
@@ -46,54 +46,56 @@ typedef struct s_philo
 	int				tte;
 	int				tts;
 	int				nme;
-}	t_philo;
+}	t_phi;
 
-// -------- Action of philosophers ---------------
+// -------- Action of phisophers ---------------
 
-void	waiting(pthread_mutex_t *stop_mutex, int *stop);
+void			waiting(pthread_mutex_t *stop_mutex, int *stop);
 
-void	death(t_philo *philo);
+void			death(t_phi *phi);
 
-void	eat(t_philo *philo, int i);
+void			eat(t_phi *phi, int i);
 
 // -------- Initialization functions -------------
 
-t_philo	*philo_init(t_shared *shared, t_philo *philo, int arc, char **arv);
+t_phi			*phi_init(t_shared *shared, t_phi *phi, int arc, char **arv);
 
-t_philo	**tab_init(t_shared *shared, int arc, char **arv);
+t_phi			**tab_init(t_shared *shared, int arc, char **arv);
 
-t_shared	*shared_init(t_shared *shared);
+t_shared		*shared_init(t_shared *shared);
 
-// -------- Simulation foundamentals -------------
+// -------- Simulation foundamentals --------------
 
 long long int	get_time(struct timeval init);
 
-void	my_usleep(int mms, struct timeval init);
+void			my_usleep(int mms, t_shared *shared);
 
-void	free_all(t_shared *shared, t_philo **tab);
+void			free_all(t_shared *shared, t_phi **tab);
 
-void	launch_simulation(t_shared *shared, t_philo **tab);
+void			launch_simulation(t_shared *shared, t_phi **tab);
 
 // -------- Threads routines ---------------------
 
-void	*philo_routine(void *arg);
+void			*phi_routine(void *arg);
 
-void	odd_routine(t_philo *philo, int i);
+void			odd_routine(t_phi *phi, int i);
 
-void	even_routine(t_philo *philo, int i);
+void			even_routine(t_phi *phi, int i);
 
-void	death_control(t_philo **tab, t_shared *shared, int *tmp);
+void			death_control(t_phi **tab, t_shared *shared);
 
-void	*control_routine(void *arg);
+void			*control_routine(void *arg);
 
 // -------- Utilities and error managment --------
 
-void	print(t_philo *philo, char *str);
+void			print(t_phi *phi, char *str);
 
-int		ft_atoi(const char *str);
+int				ft_atoi(const char *str);
 
-int		ft_strncmp(const char *s1, const char *s2, int n);
+int				ft_strncmp(const char *s1, const char *s2, int n);
 
-int		error_managment(int argc, char **argv);
+int				error_managment(int argc, char **argv);
+
+int				is_end(t_shared *shared);
 
 #endif
